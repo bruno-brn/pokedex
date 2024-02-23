@@ -6,7 +6,10 @@
       <h4 class="is-size-4">Pokedex</h4>
       <input type="text" placeholder="Buscar pokemon" v-model="busca" class="input is-rounded">
       <button  class="button  is-fullwidth" id="buscaBtn" @click="buscar">Buscar</button>
-      <div v-for="(poke, index) in filteredPokemons" :key="poke.url">
+      <div v-if="mostrarErro" class="mensagem-erro">
+        {{ mensagemErro }}
+      </div>
+      <div class="pokemon-list" v-for="(poke, index) in filteredPokemons" :key="poke.url">
         <Pokemon :name="poke.name" :url="poke.url" :num="index +1"/>
       </div>
     </div>
@@ -24,6 +27,8 @@ export default {
       pokemons:[],
       filteredPokemons: [],
       busca: '',
+      mostrarErro: false,
+      mensagemErro: '' 
     }
   },
   created: function(){
@@ -38,13 +43,22 @@ export default {
   },
   methods:{
     buscar: function(){
+      this.mensagemErro = '';
+
       this.filteredPokemons = this.pokemons
+
       if(this.busca.trim() === ''){
         this.filteredPokemons = this.pokemons
       }else{
-        this.filteredPokemons = this.pokemons.filter(pokemon => pokemon.name.toLowerCase().includes(this.busca.toLowerCase()));
+        const pokemonEncontrado = this.pokemons.find(pokemon => pokemon.name.toLowerCase() === this.busca.toLowerCase())
+        if (!pokemonEncontrado){
+          this.mostrarErro = true
+          this.mensagemErro = 'Pokemon não encontrado ou não pertence a essa base de dados'
+        }else{
+          this.filteredPokemons = this.pokemons.filter(pokemon => pokemon.name.toLowerCase().includes(this.busca.toLowerCase()));
+        }
       }
-    }
+    },
   },
 }
 </script>
@@ -65,5 +79,10 @@ export default {
   background-color: #4169E1;
   color: white;
 }
+
+.mensagem-erro{
+  color: red;
+}
+
 
 </style>
